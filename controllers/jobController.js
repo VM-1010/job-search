@@ -1,4 +1,5 @@
 import { validationResult } from 'express-validator';
+import Company from '../models/companyModel.js';
 import Job from '../models/jobModel.js';
 import Recruiter from '../models/recruiterModel.js';
 
@@ -127,6 +128,11 @@ export const editJob = async (req, res, next) => {
 // @access  Private (Recruiter only, belonging to same company)
 export const deleteJob = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const recruiter = await Recruiter.findById(req.user._id);
     if (!recruiter.company) {
       return res.status(400).json({ message: 'Recruiter is not associated with any company' });
@@ -160,6 +166,11 @@ export const deleteJob = async (req, res, next) => {
 // @access  Private (Recruiter only, belonging to same company)
 export const closeJob = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const recruiter = await Recruiter.findById(req.user._id);
     if (!recruiter.company) {
       return res.status(400).json({ message: 'Recruiter is not associated with any company' });
@@ -197,6 +208,11 @@ export const closeJob = async (req, res, next) => {
 // @access  Private (Recruiter only, belonging to same company)
 export const reopenJob = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const recruiter = await Recruiter.findById(req.user._id);
     if (!recruiter.company) {
       return res.status(400).json({ message: 'Recruiter is not associated with any company' });
@@ -248,48 +264,91 @@ export const getRecruiterJobs = async (req, res, next) => {
 // @access  Public
 export const getJobs = async (req, res, next) => {
   try {
-    const query = { status: 'Open' }; // default only show Open listings
+    const query = { status: 'Open' };
+    const orFilters = [];
 
-    // Search query param (searches title, description, or skills)
     if (req.query.search) {
-      query.$or = [
-        { title: { $regex: req.query.search, $options: 'i' } },
-        { description: { $regex: req.query.search, $options: 'i' } },
-        { skills: { $regex: req.query.search, $options: 'i' } }
-      ];
+      const searchRegex = { $regex: req.query.search, $options: 'i' };
+      orFilters.push(
+        { title: searchRegex },
+        { description: searchRegex },
+        { skills: searchRegex },
+        { category: searchRegex },
+        { location: searchRegex },
+        { employmentType: searchRegex }
+      );
+
+      const matchingCompanies = await Company.find({
+        $or: [
+          { companyName: searchRegex },
+          { industry: searchRegex }
+        ]
+      }).select('_id');
+
+      if (matchingCompanies.length > 0) {
+        orFilters.push({ company: { $in: matchingCompanies.map((company) => company._id) } });
+      }
     }
 
-    // Title filter (specific text)
     if (req.query.title) {
-      query.title = { $regex: req.query.title, $options: 'i' };
+      orFilters.push({ title: { $regex: req.query.title, $options: 'i' } });
     }
 
-    // Category filter
     if (req.query.category) {
       query.category = { $regex: req.query.category, $options: 'i' };
     }
 
-    // Location filter
     if (req.query.location) {
       query.location = { $regex: req.query.location, $options: 'i' };
     }
 
-    // Employment type filter
     if (req.query.employmentType) {
       query.employmentType = req.query.employmentType;
     }
 
-    // Company filter
     if (req.query.companyId) {
       query.company = req.query.companyId;
     }
 
-    const jobs = await Job.find(query)
+    if (req.query.company) {
+      if (req.query.company.match(/^[0-9a-fA-F]{24}$/)) {
+        query.company = req.query.company;
+      } else {
+        const matchingCompanies = await Company.find({
+          companyName: { $regex: req.query.company, $options: 'i' }
+        }).select('_id');
+
+        if (matchingCompanies.length > 0) {
+          orFilters.push({ company: { $in: matchingCompanies.map((company) => company._id) } });
+        }
+      }
+    }
+
+    if (orFilters.length > 0) {
+      query.$or = orFilters;
+    }
+
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+    const skip = (page - 1) * limit;
+
+    const [jobs, total] = await Promise.all([
+      Job.find(query)
       .populate('company', 'companyName logo industry headquarters website')
       .populate('recruiter', 'recruiterName email title profilePicture')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit),
+      Job.countDocuments(query)
+    ]);
 
-    res.json(jobs);
+    res.json({
+      jobs,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (error) {
     next(error);
   }
@@ -300,6 +359,11 @@ export const getJobs = async (req, res, next) => {
 // @access  Public
 export const getJobById = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const job = await Job.findById(req.params.id)
       .populate('company', 'companyName logo industry headquarters website companySize description contactEmail foundedYear socialLinks')
       .populate('recruiter', 'recruiterName email title profilePicture');

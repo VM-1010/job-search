@@ -77,6 +77,7 @@ const UserSchema = new mongoose.Schema(
       about: { type: String, default: "" },
       location: { type: String, default: "" },
       profilePhoto: { type: String, default: "" },
+      profilePicture: { type: String, default: "" },
       education: [EducationSchema],
       experience: [ExperienceSchema],
       certifications: [CertificationSchema],
@@ -96,6 +97,16 @@ const UserSchema = new mongoose.Schema(
         industries: { type: [String], default: [] },
       },
     },
+    savedJobs: [
+      {
+        job: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Job",
+          required: true,
+        },
+        savedAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

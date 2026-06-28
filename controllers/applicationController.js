@@ -3,6 +3,17 @@ import Application from "../models/applicationModel.js";
 import Job from "../models/jobModel.js";
 import Recruiter from "../models/recruiterModel.js";
 import User from "../models/userModel.js";
+import Notification from "../models/notificationModel.js";
+
+const createNotificationSafely = async (payload) => {
+  try {
+    await Notification.create(payload);
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn("Notification write skipped:", error.message);
+    }
+  }
+};
 
 // @desc    Apply to a job
 // @route   POST /api/applications
@@ -41,7 +52,7 @@ export const applyToJob = async (req, res, next) => {
     }
 
     // Retrieve full user profile to build the snapshot
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).lean();
 
     // Create the profile snapshot at the time of application
     const profileSnapshot = structuredClone({
@@ -66,6 +77,13 @@ export const applyToJob = async (req, res, next) => {
       profileSnapshot,
     });
 
+    await createNotificationSafely({
+      recipient: job.recruiter,
+      title: "New application received",
+      message: `${user.name} applied for ${job.title}`,
+      type: "application_received",
+    });
+
     res.status(201).json({
       message: "Application submitted successfully",
       application,
@@ -78,109 +96,124 @@ export const applyToJob = async (req, res, next) => {
   }
 };
 
-// @desc    Get current job seeker's applications
-// @route   GET /api/applications/my-applications
-// @access  Private (Job Seeker only)
-export const getMyApplications = async (req, res, next) => {
-  try {
-    const applications = await Application.find({ applicant: req.user._id })
-      .populate(
+  // @desc    Get current job seeker's applications
+  // @route   GET /api/applications/my-applications
+  // @access  Private (Job Seeker only)
+  export const getMyApplications = async (req, res, next) => {
+    try {
+      const applications = await Application.find({ applicant: req.user._id })
+        .populate(
+          "job",
+          "title location category employmentType experienceLevel salaryRange status",
+        )
+        .populate("company", "companyName logo industry headquarters")
+        .populate("recruiter", "recruiterName email title")
+        .sort({ createdAt: -1 });
+
+      res.json(applications);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // @desc    Get applicants for a specific job
+  // @route   GET /api/applications/job/:jobId
+  // @access  Private (Recruiter of that company only)
+  export const getApplicantsForJob = async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const recruiter = await Recruiter.findById(req.user._id);
+      if (!recruiter.company) {
+        return res
+          .status(400)
+          .json({ message: "Recruiter is not associated with any company" });
+      }
+
+      const job = await Job.findById(req.params.jobId);
+      if (!job) {
+        return res.status(404).json({ message: "Job not found" });
+      }
+
+      // Verify job belongs to recruiter's company
+      if (job.company.toString() !== recruiter.company.toString()) {
+        return res.status(403).json({
+          message:
+            "Forbidden: You do not have permissions to view applicants for this job",
+        });
+      }
+
+      const applications = await Application.find({ job: req.params.jobId })
+        .populate("applicant", "name email")
+        .sort({ createdAt: -1 });
+
+      res.json(applications);
+    } catch (error) {
+      if (error.kind === "ObjectId") {
+        return res.status(400).json({ message: "Invalid job ID format" });
+      }
+      next(error);
+    }
+  };
+
+  // @desc    Update application status
+  // @route   PUT /api/applications/:id/status
+  // @access  Private (Recruiter of that company only)
+  export const updateApplicationStatus = async (req, res, next) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const { status } = req.body;
+
+      const application = await Application.findById(req.params.id).populate(
         "job",
-        "title location category employmentType experienceLevel salaryRange status",
-      )
-      .populate("company", "companyName logo industry headquarters")
-      .populate("recruiter", "recruiterName email title")
-      .sort({ createdAt: -1 });
+      );
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
 
-    res.json(applications);
-  } catch (error) {
-    next(error);
-  }
-};
+      const recruiter = await Recruiter.findById(req.user._id);
+      if (!recruiter.company) {
+        return res
+          .status(400)
+          .json({ message: "Recruiter is not associated with any company" });
+      }
 
-// @desc    Get applicants for a specific job
-// @route   GET /api/applications/job/:jobId
-// @access  Private (Recruiter of that company only)
-export const getApplicantsForJob = async (req, res, next) => {
-  try {
-    const recruiter = await Recruiter.findById(req.user._id);
-    if (!recruiter.company) {
-      return res
-        .status(400)
-        .json({ message: "Recruiter is not associated with any company" });
-    }
+      // Verify application job belongs to recruiter's company
+      if (application.job.company.toString() !== recruiter.company.toString()) {
+        return res.status(403).json({
+          message:
+            "Forbidden: You do not have permissions to update this application",
+        });
+      }
 
-    const job = await Job.findById(req.params.jobId);
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
+      const previousStatus = application.status;
+      application.status = status;
+      await application.save();
 
-    // Verify job belongs to recruiter's company
-    if (job.company.toString() !== recruiter.company.toString()) {
-      return res.status(403).json({
-        message:
-          "Forbidden: You do not have permissions to view applicants for this job",
+      if (previousStatus !== status) {
+        await createNotificationSafely({
+          recipient: application.applicant,
+          title: "Application status updated",
+          message: `Your application for ${application.job.title} is now ${status}`,
+          type: "application_status_updated",
+        });
+      }
+
+      res.json({
+        message: `Application status updated to ${status} successfully`,
+        application,
       });
+    } catch (error) {
+      if (error.kind === "ObjectId") {
+        return res.status(400).json({ message: "Invalid application ID format" });
+      }
+      next(error);
     }
-
-    const applications = await Application.find({ job: req.params.jobId })
-      .populate("applicant", "name email")
-      .sort({ createdAt: -1 });
-
-    res.json(applications);
-  } catch (error) {
-    if (error.kind === "ObjectId") {
-      return res.status(400).json({ message: "Invalid job ID format" });
-    }
-    next(error);
-  }
-};
-
-// @desc    Update application status
-// @route   PUT /api/applications/:id/status
-// @access  Private (Recruiter of that company only)
-export const updateApplicationStatus = async (req, res, next) => {
-  try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { status } = req.body;
-
-    const application = await Application.findById(req.params.id).populate(
-      "job",
-    );
-    if (!application) {
-      return res.status(404).json({ message: "Application not found" });
-    }
-
-    const recruiter = await Recruiter.findById(req.user._id);
-    if (!recruiter.company) {
-      return res
-        .status(400)
-        .json({ message: "Recruiter is not associated with any company" });
-    }
-
-    // Verify application job belongs to recruiter's company
-    if (application.job.company.toString() !== recruiter.company.toString()) {
-      return res.status(403).json({
-        message:
-          "Forbidden: You do not have permissions to update this application",
-      });
-    }
-
-    application.status = status;
-    await application.save();
-
-    res.json({
-      message: `Application status updated to ${status} successfully`,
-      application,
-    });
-  } catch (error) {
-    if (error.kind === "ObjectId") {
-      return res.status(400).json({ message: "Invalid application ID format" });
-    }
-    next(error);
-  }
-};
+  };

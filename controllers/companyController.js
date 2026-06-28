@@ -74,6 +74,11 @@ export const createCompany = async (req, res, next) => {
 // @access  Public
 export const getCompany = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const company = await Company.findById(req.params.id).populate('recruiters', 'recruiterName email title profilePicture');
     if (!company) {
       return res.status(404).json({ message: 'Company not found' });
@@ -176,7 +181,30 @@ export const updateCompany = async (req, res, next) => {
 // @access  Public
 export const listCompanies = async (req, res, next) => {
   try {
-    const companies = await Company.find();
+    const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+    const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+    const skip = (page - 1) * limit;
+    const query = {};
+
+    if (req.query.search) {
+      query.$or = [
+        { companyName: { $regex: req.query.search, $options: 'i' } },
+        { industry: { $regex: req.query.search, $options: 'i' } }
+      ];
+    }
+
+    if (req.query.name) {
+      query.companyName = { $regex: req.query.name, $options: 'i' };
+    }
+
+    if (req.query.industry) {
+      query.industry = { $regex: req.query.industry, $options: 'i' };
+    }
+
+    const [companies, total] = await Promise.all([
+      Company.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      Company.countDocuments(query)
+    ]);
 
     const result = await Promise.all(
       companies.map(async (company) => {
@@ -189,7 +217,13 @@ export const listCompanies = async (req, res, next) => {
       })
     );
 
-    res.json(result);
+    res.json({
+      companies: result,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (error) {
     next(error);
   }
@@ -200,6 +234,11 @@ export const listCompanies = async (req, res, next) => {
 // @access  Public
 export const getCompanyJobs = async (req, res, next) => {
   try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
     const company = await Company.findById(req.params.id);
     if (!company) {
       return res.status(404).json({ message: 'Company not found' });

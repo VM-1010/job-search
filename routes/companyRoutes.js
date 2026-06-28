@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import {
   createCompany,
   getCompany,
@@ -27,10 +27,14 @@ const companyUpdateValidation = [
   body('companySize').optional().trim()
 ];
 
+const companyIdValidation = [
+  param('id').isMongoId().withMessage('Invalid company ID format')
+];
+
 router.post('/', protect, authorize('recruiter'), companyValidation, createCompany);
 router.get('/', listCompanies);
-router.get('/:id', getCompany);
-router.put('/:id', protect, authorize('recruiter'), companyUpdateValidation, updateCompany);
-router.get('/:id/jobs', getCompanyJobs);
+router.get('/:id', companyIdValidation, getCompany);
+router.put('/:id', protect, authorize('recruiter'), companyIdValidation, companyUpdateValidation, updateCompany);
+router.get('/:id/jobs', companyIdValidation, getCompanyJobs);
 
 export default router;

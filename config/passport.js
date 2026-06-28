@@ -36,6 +36,7 @@ const configurePassport = () => {
                 profile.photos[0]
               ) {
                 user.profile.profilePhoto = profile.photos[0].value;
+                user.profile.profilePicture = profile.photos[0].value;
               }
               await user.save();
               return done(null, user);
@@ -58,6 +59,10 @@ const configurePassport = () => {
                 profile.photos && profile.photos[0]
                   ? profile.photos[0].value
                   : "",
+                profilePicture:
+                  profile.photos && profile.photos[0]
+                    ? profile.photos[0].value
+                    : "",
               education: [],
               experience: [],
               certifications: [],

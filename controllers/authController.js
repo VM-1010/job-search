@@ -225,6 +225,7 @@ export const updateProfile = async (req, res, next) => {
       about,
       location,
       profilePhoto,
+      profilePicture,
       education,
       experience,
       certifications,
@@ -239,7 +240,14 @@ export const updateProfile = async (req, res, next) => {
     if (headline !== undefined) user.profile.headline = headline;
     if (about !== undefined) user.profile.about = about;
     if (location !== undefined) user.profile.location = location;
-    if (profilePhoto !== undefined) user.profile.profilePhoto = profilePhoto;
+    if (profilePhoto !== undefined) {
+      user.profile.profilePhoto = profilePhoto;
+      user.profile.profilePicture = profilePhoto;
+    }
+    if (profilePicture !== undefined) {
+      user.profile.profilePicture = profilePicture;
+      user.profile.profilePhoto = profilePicture;
+    }
     if (education !== undefined) user.profile.education = education;
     if (experience !== undefined) user.profile.experience = experience;
     if (certifications !== undefined) user.profile.certifications = certifications;

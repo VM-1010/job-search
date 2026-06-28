@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import {
   createJob,
   editJob,
@@ -54,6 +54,10 @@ const jobUpdateValidation = [
   body('category').optional().notEmpty().withMessage('Category cannot be empty').trim()
 ];
 
+const jobIdValidation = [
+  param('id').isMongoId().withMessage('Invalid job ID format')
+];
+
 // Public search/view routes
 router.get('/', getJobs);
 
@@ -61,15 +65,15 @@ router.get('/', getJobs);
 router.get('/my-jobs', protect, authorize('recruiter'), getRecruiterJobs);
 
 // Job detail route
-router.get('/:id', getJobById);
+router.get('/:id', jobIdValidation, getJobById);
 
 // Recruiter creation and edit routes
 router.post('/', protect, authorize('recruiter'), jobValidation, createJob);
-router.put('/:id', protect, authorize('recruiter'), jobUpdateValidation, editJob);
-router.delete('/:id', protect, authorize('recruiter'), deleteJob);
+router.put('/:id', protect, authorize('recruiter'), jobIdValidation, jobUpdateValidation, editJob);
+router.delete('/:id', protect, authorize('recruiter'), jobIdValidation, deleteJob);
 
 // Status toggles
-router.put('/:id/close', protect, authorize('recruiter'), closeJob);
-router.put('/:id/reopen', protect, authorize('recruiter'), reopenJob);
+router.put('/:id/close', protect, authorize('recruiter'), jobIdValidation, closeJob);
+router.put('/:id/reopen', protect, authorize('recruiter'), jobIdValidation, reopenJob);
 
 export default router;

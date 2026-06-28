@@ -1,5 +1,5 @@
 import express from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import {
   applyToJob,
   getMyApplications,
@@ -23,12 +23,20 @@ const statusValidation = [
     .withMessage('Invalid application status')
 ];
 
+const applicationIdValidation = [
+  param('id').isMongoId().withMessage('Invalid application ID format')
+];
+
+const jobIdValidation = [
+  param('jobId').isMongoId().withMessage('Invalid job ID format')
+];
+
 // Seeker routes
 router.post('/', protect, authorize('seeker'), applyValidation, applyToJob);
 router.get('/my-applications', protect, authorize('seeker'), getMyApplications);
 
 // Recruiter routes
-router.get('/job/:jobId', protect, authorize('recruiter'), getApplicantsForJob);
-router.put('/:id/status', protect, authorize('recruiter'), statusValidation, updateApplicationStatus);
+router.get('/job/:jobId', protect, authorize('recruiter'), jobIdValidation, getApplicantsForJob);
+router.put('/:id/status', protect, authorize('recruiter'), applicationIdValidation, statusValidation, updateApplicationStatus);
 
 export default router;
