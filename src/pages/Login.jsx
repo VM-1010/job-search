@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Chrome, Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -147,7 +148,10 @@ const Login = () => {
             onClick={handleGoogleLogin}
             className="flex w-full items-center justify-center gap-3 rounded-xl border border-slate-800 bg-slate-950 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-slate-900 transition-colors"
           >
-            <Chrome className="h-5 w-5 text-indigo-400" />
+            <svg className="h-5 w-5 text-indigo-400" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12.24 10.285V14.4h6.887c-.648 2.41-2.519 4.114-5.136 4.114-3.478 0-6.3-2.823-6.3-6.3s2.822-6.3 6.3-6.3c1.706 0 3.24.685 4.35 1.79l3.226-3.226C19.107 2.213 15.89 1 12.24 1 6.033 1 1 6.033 1 12.24s5.033 11.24 11.24 11.24c6.48 0 11.24-4.56 11.24-11.24 0-.765-.082-1.503-.235-2.215H12.24z"/>
+            </svg>
+
             Sign in with Google
           </button>
         </div>
