@@ -1,0 +1,203 @@
+.recruiter-apps-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.recruiter-apps-container h1 {
+  font-size: 1.75rem;
+  color: #111827;
+  margin-bottom: 1.5rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.no-jobs,
+.no-applications {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.no-jobs p,
+.no-applications p {
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: #2563eb;
+  color: white;
+  padding: 0.625rem 1.25rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.job-selector {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.job-selector label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.job-selector select {
+  flex: 1;
+  max-width: 400px;
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.job-info {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.job-info h2 {
+  font-size: 1.25rem;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.job-info p {
+  color: #6b7280;
+  margin: 0;
+}
+
+.applications-table-full {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.applications-table-full table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.applications-table-full th,
+.applications-table-full td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.applications-table-full th {
+  background: #f9fafb;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.applications-table-full td {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.cover-letter-cell {
+  max-width: 250px;
+}
+
+.cover-letter-preview {
+  color: #6b7280;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.actions-cell {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.btn-accept,
+.btn-reject {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-accept {
+  background: #10b981;
+  color: white;
+}
+
+.btn-accept:hover {
+  background: #059669;
+}
+
+.btn-reject {
+  background: #ef4444;
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #dc2626;
+}
+
+.accepted-text {
+  color: #10b981;
+  font-weight: 500;
+}
+
+.rejected-text {
+  color: #ef4444;
+  font-weight: 500;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.status-accepted {
+  background: #ecfdf5;
+  color: #059669;
+}
+
+.status-rejected {
+  background: #fef2f2;
+  color: #dc2626;
+}
