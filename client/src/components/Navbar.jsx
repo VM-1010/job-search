@@ -1,14 +1,62 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Menu, X, Briefcase, User, LogOut, ChevronDown, Compass, BookOpen, Layers } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../api/axios';
+import { useToast } from '../context/ToastContext';
+import { Menu, X, Briefcase, User, LogOut, ChevronDown, Compass, BookOpen, Layers, Bell, Trash2, Check } from 'lucide-react';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, accountType } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
+  const { addToast } = useToast();
+
+  // Fetch notifications
+  const { data: notificationData } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      const response = await api.get('/notifications');
+      return response.data;
+    },
+    enabled: isAuthenticated,
+  });
+
+  const notifications = notificationData?.notifications || [];
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // Mark notification as read mutation
+  const markReadMutation = useMutation({
+    mutationFn: async (id) => {
+      const response = await api.put(`/notifications/${id}/read`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+    },
+    onError: (err) => {
+      addToast(err.response?.data?.message || 'Failed to mark notification as read', 'error');
+    },
+  });
+
+  // Delete notification mutation
+  const deleteNotificationMutation = useMutation({
+    mutationFn: async (id) => {
+      const response = await api.delete(`/notifications/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      addToast('Notification deleted', 'success');
+    },
+    onError: (err) => {
+      addToast(err.response?.data?.message || 'Failed to delete notification', 'error');
+    },
+  });
 
   const handleLogout = async () => {
     try {
@@ -84,6 +132,103 @@ const Navbar = () => {
                     </Link>
                   </>
                 )}
+
+                {/* Notification Dropdown */}
+                <div className="relative ml-2">
+                  <button
+                    onClick={() => {
+                      setShowNotifications(!showNotifications);
+                      setShowDropdown(false);
+                    }}
+                    onBlur={() => setTimeout(() => setShowNotifications(false), 200)}
+                    className="relative rounded-lg bg-slate-800 p-2 text-slate-400 hover:bg-slate-700 hover:text-white focus:outline-none transition-all"
+                  >
+                    <span className="sr-only">View notifications</span>
+                    <Bell className="h-5 w-5" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-extrabold text-white animate-pulse">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-2 w-80 origin-top-right rounded-2xl border border-slate-800 bg-slate-900 shadow-2xl z-50 overflow-hidden">
+                      <div className="border-b border-slate-805 bg-slate-900/50 px-4 py-3 flex items-center justify-between">
+                        <span className="text-sm font-semibold text-white">Notifications</span>
+                        {unreadCount > 0 && (
+                          <button
+                            onMouseDown={(e) => e.preventDefault()} // prevent blur from closing dropdown before action completes
+                            onClick={async () => {
+                              const unread = notifications.filter((n) => !n.read);
+                              for (const n of unread) {
+                                await markReadMutation.mutateAsync(n._id);
+                              }
+                              addToast('All notifications marked as read', 'success');
+                            }}
+                            className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+                      <div className="max-h-64 overflow-y-auto divide-y divide-slate-850">
+                        {notifications.length === 0 ? (
+                          <div className="p-4 text-center text-xs text-slate-500 font-medium">
+                            No notifications yet
+                          </div>
+                        ) : (
+                          notifications.map((notification) => (
+                            <div
+                              key={notification._id}
+                              className={`p-4 flex gap-2 transition-all ${
+                                notification.read ? 'opacity-65 bg-slate-950/20' : 'bg-slate-900/60'
+                              }`}
+                            >
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-xs font-semibold text-white truncate">{notification.title}</h4>
+                                  {!notification.read && (
+                                    <span className="h-1.5 w-1.5 rounded-full bg-indigo-500 shrink-0 animate-ping" />
+                                  )}
+                                </div>
+                                <p className="text-xs text-slate-400 mt-1 break-words leading-relaxed">{notification.message}</p>
+                                <span className="text-[10px] text-slate-550 block mt-1.5 font-medium">
+                                  {new Date(notification.createdAt).toLocaleDateString(undefined, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
+                              </div>
+                              <div className="flex flex-col gap-1.5 shrink-0 self-center">
+                                {!notification.read && (
+                                  <button
+                                    onMouseDown={(e) => e.preventDefault()}
+                                    onClick={() => markReadMutation.mutate(notification._id)}
+                                    className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition-colors"
+                                    title="Mark as read"
+                                  >
+                                    <Check className="h-3.5 w-3.5" />
+                                  </button>
+                                )}
+                                <button
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => deleteNotificationMutation.mutate(notification._id)}
+                                  className="p-1 rounded bg-slate-800 hover:bg-slate-750 text-slate-400 hover:text-rose-450 transition-colors"
+                                  title="Delete"
+                                >
+                                  <Trash2 className="h-3.5 w-3.5" />
+                                </button>
+                              </div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Profile Dropdown */}
                 <div className="relative ml-3">
