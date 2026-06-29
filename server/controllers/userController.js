@@ -13,7 +13,14 @@ const ensureSeeker = (req, res) => {
 };
 
 const getProfileOr404 = async (userId) => {
-  const user = await User.findById(userId).populate('savedJobs.job', 'title location category employmentType experienceLevel salaryRange status company recruiter createdAt');
+  const user = await User.findById(userId).populate({
+    path: 'savedJobs.job',
+    select: 'title location category employmentType experienceLevel salaryRange status company recruiter createdAt',
+    populate: {
+      path: 'company',
+      select: 'companyName logo'
+    }
+  });
   return user;
 };
 
