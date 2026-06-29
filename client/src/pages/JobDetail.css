@@ -1,0 +1,204 @@
+.job-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+.btn-back {
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  padding: 0.5rem;
+  transition: color 0.2s;
+}
+
+.btn-back:hover {
+  color: #2563eb;
+}
+
+.job-detail-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.job-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.job-detail-header h1 {
+  font-size: 1.75rem;
+  color: #111827;
+  margin: 0 0 0.5rem 0;
+}
+
+.job-company-name {
+  color: #2563eb;
+  font-weight: 500;
+  margin: 0;
+}
+
+.status-closed {
+  background: #fef2f2;
+  color: #dc2626;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.job-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.meta-label {
+  font-size: 0.8rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.meta-value {
+  font-size: 0.95rem;
+  color: #111827;
+  font-weight: 500;
+}
+
+.job-section {
+  margin-bottom: 2rem;
+}
+
+.job-section h2 {
+  font-size: 1.15rem;
+  color: #111827;
+  margin-bottom: 1rem;
+}
+
+.job-description {
+  color: #4b5563;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.requirements-list {
+  color: #4b5563;
+  line-height: 1.7;
+  padding-left: 1.5rem;
+}
+
+.requirements-list li {
+  margin-bottom: 0.5rem;
+}
+
+.skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill-tag {
+  background: #eff6ff;
+  color: #2563eb;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+.apply-section {
+  background: #f9fafb;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.apply-section h2 {
+  margin-bottom: 1rem;
+}
+
+.cover-letter-input {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 1rem;
+}
+
+.cover-letter-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.btn-apply {
+  background: #2563eb;
+  color: white;
+  padding: 0.875rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-apply:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-apply:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.applied-message {
+  background: #ecfdf5;
+  color: #059669;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 1rem;
+  font-weight: 500;
+}
+
+.login-prompt {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.login-prompt p {
+  margin-bottom: 0.75rem;
+}
+
+.btn-login {
+  background: #92400e;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+}
