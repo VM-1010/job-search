@@ -57,7 +57,14 @@ export const getRecruiterDashboard = async (req, res, next) => {
 
 export const getUserDashboard = async (req, res, next) => {
   try {
-    const user = await User.findById(req.user._id).populate('savedJobs.job', 'title location category employmentType experienceLevel salaryRange status company recruiter createdAt');
+    const user = await User.findById(req.user._id).populate({
+      path: 'savedJobs.job',
+      select: 'title location category employmentType experienceLevel salaryRange status company recruiter createdAt',
+      populate: {
+        path: 'company',
+        select: 'companyName logo'
+      }
+    });
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
