@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import { useToast } from '../context/ToastContext';
 import {
   Briefcase,
   MapPin,
@@ -17,7 +18,8 @@ import {
   CheckCircle,
   X,
   Send,
-  Loader2
+  Loader2,
+  Bookmark
 } from 'lucide-react';
 
 const JobDetails = () => {
@@ -25,11 +27,57 @@ const JobDetails = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isAuthenticated, accountType } = useAuth();
+  const { addToast } = useToast();
   
   const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
   const [coverLetter, setCoverLetter] = useState('');
   const [formError, setFormError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Fetch saved jobs to check if currently bookmarked
+  const { data: savedJobsData } = useQuery({
+    queryKey: ['saved-jobs'],
+    queryFn: async () => {
+      const response = await api.get('/users/saved-jobs');
+      return response.data;
+    },
+    enabled: isAuthenticated && accountType === 'seeker'
+  });
+
+  const savedJobs = savedJobsData?.savedJobs || [];
+  const isSaved = savedJobs.some((item) => (item.job?._id || item.job) === id);
+
+  // Mutation for saving job
+  const saveJobMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.post(`/users/saved-jobs/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saved-jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'user'] });
+      addToast('Job saved to bookmarks!', 'success');
+    },
+    onError: (err) => {
+      addToast(err.response?.data?.message || 'Failed to save job.', 'error');
+    }
+  });
+
+  // Mutation for removing saved job
+  const unsaveJobMutation = useMutation({
+    mutationFn: async () => {
+      const response = await api.delete(`/users/saved-jobs/${id}`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['saved-jobs'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'user'] });
+      addToast('Job removed from bookmarks.', 'success');
+    },
+    onError: (err) => {
+      addToast(err.response?.data?.message || 'Failed to remove job.', 'error');
+    }
+  });
 
   // Fetch job details
   const {
@@ -319,6 +367,31 @@ const JobDetails = () => {
                 className="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold text-sm shadow-lg shadow-indigo-500/20 hover:from-indigo-600 hover:to-purple-700 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 Apply for Job
+              </button>
+            )}
+
+            {(!isAuthenticated || accountType === 'seeker') && (
+              <button
+                onClick={() => {
+                  if (!isAuthenticated) {
+                    navigate(`/login?redirect=/job/${id}`);
+                    return;
+                  }
+                  if (isSaved) {
+                    unsaveJobMutation.mutate();
+                  } else {
+                    saveJobMutation.mutate();
+                  }
+                }}
+                disabled={saveJobMutation.isPending || unsaveJobMutation.isPending}
+                className={`w-full sm:w-auto px-6 py-3 rounded-xl border font-semibold text-sm transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                  isSaved
+                    ? 'border-indigo-500/30 bg-indigo-500/10 text-indigo-400 hover:bg-indigo-500/20'
+                    : 'border-slate-800 bg-slate-900 text-slate-350 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <Bookmark className={`h-4 w-4 ${isSaved ? 'fill-indigo-400' : ''}`} />
+                {isSaved ? 'Saved' : 'Save Job'}
               </button>
             )}
           </div>
