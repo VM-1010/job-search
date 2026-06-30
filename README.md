@@ -10,12 +10,12 @@ A RESTful backend for **JobSphere**, a MERN-based job portal that connects job s
 
 ## Authentication
 
-* JWT Authentication
-* Password hashing with bcrypt
-* Role-based authorization
-* Job Seeker registration and login
-* Recruiter registration and login
-* Google OAuth support (Job Seekers)
+- JWT Authentication
+- Password hashing with bcrypt
+- Role-based authorization
+- Job Seeker registration and login
+- Recruiter registration and login
+- Google OAuth support (Job Seekers)
 
 ---
 
@@ -23,18 +23,18 @@ A RESTful backend for **JobSphere**, a MERN-based job portal that connects job s
 
 Users can manage:
 
-* Professional headline
-* About section
-* Location
-* Resume
-* Education
-* Experience
-* Certifications
-* Projects
-* Skills
-* Languages
-* Job preferences
-* Social links
+- Professional headline
+- About section
+- Location
+- Resume
+- Education
+- Experience
+- Certifications
+- Projects
+- Skills
+- Languages
+- Job preferences
+- Social links
 
 ---
 
@@ -42,11 +42,11 @@ Users can manage:
 
 Recruiters can:
 
-* Create companies
-* Update company profiles
-* View company information
-* Manage recruiters within a company
-* View company job listings
+- Create companies
+- Update company profiles
+- View company information
+- Manage recruiters within a company
+- View company job listings
 
 ---
 
@@ -54,53 +54,53 @@ Recruiters can:
 
 Recruiters can:
 
-* Create jobs
-* Edit jobs
-* Delete jobs
-* Close jobs
-* Reopen jobs
+- Create jobs
+- Edit jobs
+- Delete jobs
+- Close jobs
+- Reopen jobs
 
 Job seekers can:
 
-* Browse jobs
-* Search jobs
-* Filter jobs
-* View job details
+- Browse jobs
+- Search jobs
+- Filter jobs
+- View job details
 
 ---
 
 ## Applications
 
-* Apply for jobs
-* Prevent duplicate applications
-* Immutable applicant profile snapshots
-* Recruiter applicant management
-* Application status tracking
+- Apply for jobs
+- Prevent duplicate applications
+- Immutable applicant profile snapshots
+- Recruiter applicant management
+- Application status tracking
 
 Status values:
 
-* Applied
-* Under Review
-* Shortlisted
-* Interview
-* Rejected
-* Accepted
+- Applied
+- Under Review
+- Shortlisted
+- Interview
+- Rejected
+- Accepted
 
 ---
 
 ## Saved Jobs
 
-* Save jobs
-* Remove saved jobs
-* View saved jobs
+- Save jobs
+- Remove saved jobs
+- View saved jobs
 
 ---
 
 ## Notifications
 
-* Application notifications
-* Status update notifications
-* Read/Delete notifications
+- Application notifications
+- Status update notifications
+- Read/Delete notifications
 
 ---
 
@@ -108,29 +108,29 @@ Status values:
 
 ### Job Seeker Dashboard
 
-* Recent applications
-* Saved jobs
-* Application statistics
-* Profile completion
+- Recent applications
+- Saved jobs
+- Application statistics
+- Profile completion
 
 ### Recruiter Dashboard
 
-* Job statistics
-* Applicant counts
-* Recent applications
+- Job statistics
+- Applicant counts
+- Recent applications
 
 ---
 
 # Tech Stack
 
-* Node.js
-* Express.js
-* MongoDB
-* Mongoose
-* JWT
-* Passport.js
-* bcrypt
-* express-validator
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT
+- Passport.js
+- bcrypt
+- express-validator
 
 ---
 
@@ -156,15 +156,15 @@ server/
 
 # API Modules
 
-* Authentication
-* User Profiles
-* Recruiters
-* Companies
-* Jobs
-* Applications
-* Saved Jobs
-* Notifications
-* Dashboards
+- Authentication
+- User Profiles
+- Recruiters
+- Companies
+- Jobs
+- Applications
+- Saved Jobs
+- Notifications
+- Dashboards
 
 Detailed documentation is available in:
 
@@ -178,24 +178,24 @@ BACKEND_API.md
 
 The backend includes automated integration tests covering:
 
-* Authentication
-* Authorization
-* User Profiles
-* Companies
-* Jobs
-* Applications
-* Saved Jobs
-* Notifications
-* Dashboard APIs
-* Validation
-* Database Integrity
-* Error Handling
-* Performance
+- Authentication
+- Authorization
+- User Profiles
+- Companies
+- Jobs
+- Applications
+- Saved Jobs
+- Notifications
+- Dashboard APIs
+- Validation
+- Database Integrity
+- Error Handling
+- Performance
 
 **Current Status**
 
-* Test Suites: **13/13 Passed**
-* Tests: **72/72 Passed**
+- Test Suites: **13/13 Passed**
+- Tests: **72/72 Passed**
 
 ---
 
@@ -239,7 +239,17 @@ npm run dev
 
 The backend is complete and tested.
 
-The next phase of the project is the React frontend, which will consume the REST API provided by this backend.
+The React frontend lives in `client/` and consumes the REST API provided by this backend.
+
+### Frontend Quick Start
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+See `client/README.md` for full frontend documentation.
 
 ---
 
