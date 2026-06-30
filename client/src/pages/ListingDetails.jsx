@@ -37,6 +37,7 @@ import {
   DollarSign,
   CheckCircle2,
   Eye,
+  Briefcase,
 } from "lucide-react";
 
 const STATUSES = ["Pending", "Interview", "Accepted", "Rejected"];
@@ -50,9 +51,9 @@ const STATUS_VARIANT = {
 function SkeletonDetail() {
   return (
     <div className="max-w-3xl space-y-4">
-      <div className="skeleton h-6 w-48" />
-      <div className="skeleton h-4 w-32" />
-      <div className="skeleton h-20 w-full" />
+      <div className="skeleton h-6 w-48 rounded-lg" />
+      <div className="skeleton h-4 w-32 rounded-md" />
+      <div className="skeleton h-24 w-full rounded-xl" />
     </div>
   );
 }
@@ -151,7 +152,7 @@ export default function ListingDetails() {
     );
 
   return (
-    <div className="max-w-3xl space-y-6 animate-slide-up">
+    <div className="max-w-3xl space-y-6 animate-fade-in-up">
       {/* Back + Edit */}
       <div className="flex items-center gap-2">
         <Button
@@ -180,94 +181,53 @@ export default function ListingDetails() {
       {isEdit ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Edit Listing</CardTitle>
+            <CardTitle>Edit Listing</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-1.5">
                   <Label>Title *</Label>
-                  <Input
-                    name="title"
-                    value={form.title}
-                    onChange={setField}
-                    required
-                  />
+                  <Input name="title" value={form.title} onChange={setField} required />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Company *</Label>
-                  <Input
-                    name="company"
-                    value={form.company}
-                    onChange={setField}
-                    required
-                  />
+                  <Input name="company" value={form.company} onChange={setField} required />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Location *</Label>
-                  <Input
-                    name="location"
-                    value={form.location}
-                    onChange={setField}
-                    required
-                  />
+                  <Input name="location" value={form.location} onChange={setField} required />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Category</Label>
-                  <Input
-                    name="category"
-                    value={form.category}
-                    onChange={setField}
-                  />
+                  <Input name="category" value={form.category} onChange={setField} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Salary Min</Label>
-                  <Input
-                    name="salaryMin"
-                    type="number"
-                    value={form.salaryMin}
-                    onChange={setField}
-                  />
+                  <Input name="salaryMin" type="number" value={form.salaryMin} onChange={setField} />
                 </div>
                 <div className="space-y-1.5">
                   <Label>Salary Max</Label>
-                  <Input
-                    name="salaryMax"
-                    type="number"
-                    value={form.salaryMax}
-                    onChange={setField}
-                  />
+                  <Input name="salaryMax" type="number" value={form.salaryMax} onChange={setField} />
                 </div>
               </div>
               <div className="space-y-1.5">
                 <Label>Description *</Label>
-                <Textarea
-                  name="description"
-                  value={form.description}
-                  onChange={setField}
-                  required
-                  rows={4}
-                />
+                <Textarea name="description" value={form.description} onChange={setField} required rows={4} />
               </div>
               <div className="space-y-1.5">
                 <Label>Additional Info</Label>
-                <Input
-                  name="additionalInfo"
-                  value={form.additionalInfo}
-                  onChange={setField}
-                />
+                <Input name="additionalInfo" value={form.additionalInfo} onChange={setField} />
               </div>
               {saveMsg && (
-                <div className="flex items-center gap-2 text-sm text-emerald-600">
+                <div className="flex items-center gap-2 text-sm text-[var(--success)] animate-fade-in">
                   <CheckCircle2 className="h-4 w-4" />
                   {saveMsg}
                 </div>
               )}
               <div className="flex gap-2">
                 <Button type="submit" disabled={saving}>
-                  {saving && (
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  )}
+                  {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Changes
                 </Button>
                 <Button
@@ -282,33 +242,47 @@ export default function ListingDetails() {
           </CardContent>
         </Card>
       ) : (
-        /* View Mode */
+        /* View Mode — hero-style header */
         <Card>
-          <CardContent className="p-5 space-y-3">
-            <h2 className="text-lg font-bold text-[var(--text)]">
-              {job.title}
-            </h2>
-            <div className="flex flex-wrap gap-2 text-sm text-[var(--text-secondary)]">
-              <span className="flex items-center gap-1">
-                <MapPin className="h-3.5 w-3.5" />
-                {job.company} · {job.location}
-              </span>
+          <CardContent className="p-6 space-y-4">
+            {/* Title + company chip */}
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-[var(--text-primary)]">
+                {job.title}
+              </h2>
+              <div className="mt-2 flex items-center gap-1.5 text-sm text-[var(--text-secondary)]">
+                <Briefcase className="h-3.5 w-3.5 shrink-0" />
+                <span>{job.company}</span>
+              </div>
+            </div>
+
+            {/* Fact pills */}
+            <div className="flex flex-wrap gap-2">
+              {job.location && (
+                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-1 text-xs text-[var(--text-secondary)]">
+                  <MapPin className="h-3 w-3" />
+                  {job.location}
+                </span>
+              )}
               {(job.salaryMin || job.salaryMax) && (
-                <Badge variant="outline">
-                  <DollarSign className="mr-0.5 h-3 w-3" />
-                  {job.salaryMin?.toLocaleString()} –{" "}
-                  {job.salaryMax?.toLocaleString()}
-                </Badge>
+                <span className="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--surface-raised)] px-3 py-1 text-xs text-[var(--text-secondary)]">
+                  <DollarSign className="h-3 w-3" />
+                  {job.salaryMin?.toLocaleString()} – {job.salaryMax?.toLocaleString()}
+                </span>
               )}
               {job.category && (
-                <Badge variant="secondary">{job.category}</Badge>
+                <Badge variant="accent">{job.category}</Badge>
               )}
             </div>
-            <p className="whitespace-pre-wrap text-sm text-[var(--text)]">
+
+            <Separator />
+
+            {/* Description */}
+            <p className="whitespace-pre-wrap text-sm text-[var(--text-primary)] leading-relaxed">
               {job.description}
             </p>
             {job.additionalInfo && (
-              <p className="whitespace-pre-wrap text-xs text-[var(--text-muted)] border-t border-[var(--border)] pt-3">
+              <p className="whitespace-pre-wrap text-xs text-[var(--text-muted)] border-t border-[var(--border)] pt-3 leading-relaxed">
                 {job.additionalInfo}
               </p>
             )}
@@ -320,14 +294,17 @@ export default function ListingDetails() {
 
       {/* Applicants */}
       <div>
-        <h3 className="mb-3 text-base font-semibold text-[var(--text)]">
+        <h3 className="mb-3 text-base font-semibold tracking-tight text-[var(--text-primary)]">
           Applicants ({apps.length})
         </h3>
         {apps.length === 0 ? (
-          <div className="flex flex-col items-center py-12 text-center">
-            <Users className="h-8 w-8 text-[var(--text-muted)] mb-2" />
-            <p className="text-sm text-[var(--text-secondary)]">
-              No applicants yet.
+          <div className="flex flex-col items-center py-12 text-center rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--surface-raised)]">
+              <Users className="h-6 w-6 text-[var(--text-muted)]" />
+            </div>
+            <p className="text-sm font-medium text-[var(--text-secondary)]">No applicants yet</p>
+            <p className="mt-1 text-xs text-[var(--text-muted)]">
+              Applications will appear here once candidates apply.
             </p>
           </div>
         ) : (
@@ -337,22 +314,20 @@ export default function ListingDetails() {
                 <TableHead>Name</TableHead>
                 <TableHead>Applied</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-48" />
+                <TableHead className="w-52" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {apps.map((app) => (
                 <TableRow key={app._id}>
-                  <TableCell className="font-medium text-[var(--text)]">
+                  <TableCell className="font-medium text-[var(--text-primary)]">
                     {app.applicantName ?? "—"}
                   </TableCell>
                   <TableCell className="text-xs text-[var(--text-muted)]">
                     {new Date(app.appliedAt).toLocaleDateString()}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={STATUS_VARIANT[app.status] ?? "secondary"}
-                    >
+                    <Badge variant={STATUS_VARIANT[app.status] ?? "secondary"}>
                       {app.status}
                     </Badge>
                   </TableCell>
@@ -360,9 +335,7 @@ export default function ListingDetails() {
                     <div className="flex items-center gap-2">
                       <Select
                         value={app.status}
-                        onValueChange={(s) =>
-                          handleStatusChange(app._id, s)
-                        }
+                        onValueChange={(s) => handleStatusChange(app._id, s)}
                       >
                         <SelectTrigger className="w-32 h-8 text-xs">
                           <SelectValue />
@@ -378,7 +351,7 @@ export default function ListingDetails() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="gap-1 text-[var(--text-secondary)]"
+                        className="gap-1 text-[var(--text-secondary)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)]"
                         onClick={() =>
                           navigate(`/emp/applicant/${app.user?._id}`)
                         }

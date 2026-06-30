@@ -4,11 +4,21 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="JobSphere — Find your next opportunity or hire great talent." />
+    <meta name="description" content="JobSphere — The modern recruiting platform connecting top talent with great companies." />
+    <meta name="theme-color" content="#5B5BF6" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <title>JobSphere</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet" />
+    <title>JobSphere — Find Your Next Opportunity</title>
+    <!-- Dark mode: apply class synchronously to prevent FOUC -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('jobplatform_theme');
+          if (t === 'dark') document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

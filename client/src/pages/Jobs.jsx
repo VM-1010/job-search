@@ -22,6 +22,7 @@ import {
   Loader2,
   CheckCircle2,
   AlertCircle,
+  SlidersHorizontal,
 } from "lucide-react";
 
 function SkeletonGrid() {
@@ -34,8 +35,8 @@ function SkeletonGrid() {
             <div className="skeleton h-3 w-1/2" />
             <div className="skeleton h-3 w-1/3" />
             <div className="flex gap-2 pt-2">
-              <div className="skeleton h-8 flex-1" />
-              <div className="skeleton h-8 flex-1" />
+              <div className="skeleton h-8 flex-1 rounded-lg" />
+              <div className="skeleton h-8 flex-1 rounded-lg" />
             </div>
           </CardContent>
         </Card>
@@ -111,83 +112,87 @@ export default function Jobs() {
 
   return (
     <div className="space-y-5">
-      {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
-              <Input
-                name="search"
-                placeholder="Search title…"
-                value={filters.search}
-                onChange={handleFilterChange}
-                className="pl-9"
-              />
-            </div>
-            <div className="relative">
-              <Building2 className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
-              <Input
-                name="company"
-                placeholder="Company…"
-                value={filters.company}
-                onChange={handleFilterChange}
-                className="pl-9"
-              />
-            </div>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
-              <Input
-                name="location"
-                placeholder="Location…"
-                value={filters.location}
-                onChange={handleFilterChange}
-                className="pl-9"
-              />
-            </div>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
-              <Input
-                name="salaryMin"
-                placeholder="Min salary"
-                value={filters.salaryMin}
-                onChange={handleFilterChange}
-                type="number"
-                className="pl-9"
-              />
-            </div>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
-              <Input
-                name="salaryMax"
-                placeholder="Max salary"
-                value={filters.salaryMax}
-                onChange={handleFilterChange}
-                type="number"
-                className="pl-9"
-              />
-            </div>
+      {/* Sticky filter bar */}
+      <div className="sticky top-0 z-10 -mx-6 -mt-6 px-6 pt-6 pb-4 bg-[var(--bg)]/90 backdrop-blur-md border-b border-[var(--border)]">
+        <div className="flex items-center gap-2 mb-3">
+          <SlidersHorizontal className="h-4 w-4 text-[var(--text-muted)]" />
+          <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Filters
+          </span>
+        </div>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Input
+              name="search"
+              placeholder="Search title…"
+              value={filters.search}
+              onChange={handleFilterChange}
+              className="pl-9"
+            />
           </div>
-        </CardContent>
-      </Card>
+          <div className="relative">
+            <Building2 className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Input
+              name="company"
+              placeholder="Company…"
+              value={filters.company}
+              onChange={handleFilterChange}
+              className="pl-9"
+            />
+          </div>
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Input
+              name="location"
+              placeholder="Location…"
+              value={filters.location}
+              onChange={handleFilterChange}
+              className="pl-9"
+            />
+          </div>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Input
+              name="salaryMin"
+              placeholder="Min salary"
+              value={filters.salaryMin}
+              onChange={handleFilterChange}
+              type="number"
+              className="pl-9"
+            />
+          </div>
+          <div className="relative">
+            <DollarSign className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--text-muted)]" />
+            <Input
+              name="salaryMax"
+              placeholder="Max salary"
+              value={filters.salaryMax}
+              onChange={handleFilterChange}
+              type="number"
+              className="pl-9"
+            />
+          </div>
+        </div>
+      </div>
 
       {/* States */}
       {loading && <SkeletonGrid />}
       {error && (
         <div className="flex flex-col items-center py-16 text-center">
-          <AlertCircle className="h-8 w-8 text-[var(--danger)] mb-2" />
-          <p className="text-sm text-[var(--danger)]">{error}</p>
+          <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--danger-bg)]">
+            <AlertCircle className="h-6 w-6 text-[var(--danger)]" />
+          </div>
+          <p className="text-sm font-medium text-[var(--danger)]">{error}</p>
         </div>
       )}
       {!loading && !error && jobs.length === 0 && (
-        <div className="flex flex-col items-center py-20 text-center">
-          <Briefcase className="h-10 w-10 text-[var(--text-muted)] mb-3" />
-          <p className="text-sm font-medium text-[var(--text-secondary)]">
-            No jobs found
-          </p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
-            Try adjusting your filters.
-          </p>
+        <div className="flex flex-col items-center py-20 text-center animate-fade-in-up">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface-raised)] border border-[var(--border)]">
+            <Briefcase className="h-7 w-7 text-[var(--text-muted)]" />
+          </div>
+          <p className="text-base font-semibold text-[var(--text-primary)]">No jobs found</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">Try adjusting your filters.</p>
         </div>
       )}
 
@@ -216,18 +221,18 @@ export default function Jobs() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-3 text-sm text-[var(--text-secondary)]">
-            {(infoJob?.salaryMin || infoJob?.salaryMax) && (
-              <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
+              {(infoJob?.salaryMin || infoJob?.salaryMax) && (
                 <Badge variant="outline">
                   ${infoJob?.salaryMin?.toLocaleString()} – $
                   {infoJob?.salaryMax?.toLocaleString()}
                 </Badge>
-              </div>
-            )}
-            {infoJob?.category && (
-              <Badge variant="secondary">{infoJob.category}</Badge>
-            )}
-            <p className="whitespace-pre-wrap text-[var(--text)]">
+              )}
+              {infoJob?.category && (
+                <Badge variant="accent">{infoJob.category}</Badge>
+              )}
+            </div>
+            <p className="whitespace-pre-wrap text-[var(--text-primary)] leading-relaxed">
               {infoJob?.description}
             </p>
             {infoJob?.additionalInfo && (
@@ -248,18 +253,22 @@ export default function Jobs() {
           </DialogHeader>
 
           {applyMsg ? (
-            <div className="flex flex-col items-center gap-2 py-2 text-center">
+            <div className="flex flex-col items-center gap-3 py-2 text-center">
               {applyStatus === "success" ? (
-                <CheckCircle2 className="h-8 w-8 text-emerald-500" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--success-bg)]">
+                  <CheckCircle2 className="h-7 w-7 text-[var(--success)]" />
+                </div>
               ) : (
-                <AlertCircle className="h-8 w-8 text-[var(--danger)]" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--danger-bg)]">
+                  <AlertCircle className="h-7 w-7 text-[var(--danger)]" />
+                </div>
               )}
               <p className="text-sm text-[var(--text-secondary)]">{applyMsg}</p>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setApplyJob(null)}
-                className="mt-2"
+                className="mt-1"
               >
                 Close
               </Button>

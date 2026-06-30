@@ -29,6 +29,8 @@ import {
   Loader2,
   List,
   AlertTriangle,
+  MapPin,
+  DollarSign,
 } from "lucide-react";
 
 const EMPTY_FORM = {
@@ -44,20 +46,18 @@ const EMPTY_FORM = {
 
 function SkeletonTable() {
   return (
-    <Card>
-      <CardContent className="p-0">
-        <div className="p-4 space-y-3">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="flex gap-4">
-              <div className="skeleton h-4 flex-[2]" />
-              <div className="skeleton h-4 flex-1" />
-              <div className="skeleton h-4 flex-1" />
-              <div className="skeleton h-4 w-32" />
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-sm)] overflow-hidden">
+      <div className="p-4 space-y-3">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="flex gap-4 items-center">
+            <div className="skeleton h-4 flex-[2] rounded-md" />
+            <div className="skeleton h-4 flex-1 rounded-md" />
+            <div className="skeleton h-4 flex-1 rounded-md" />
+            <div className="skeleton h-4 w-32 rounded-md" />
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -73,7 +73,6 @@ export default function Listings() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
 
-  // Delete dialog
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -129,10 +128,13 @@ export default function Listings() {
 
   return (
     <div className="space-y-4">
+      {/* Header bar */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-[var(--text-secondary)]">
-          {jobs.length} listing{jobs.length !== 1 ? "s" : ""}
-        </p>
+        <div>
+          <p className="text-sm text-[var(--text-muted)]">
+            {jobs.length} listing{jobs.length !== 1 ? "s" : ""}
+          </p>
+        </div>
         <Button
           id="new-listing-btn"
           onClick={() => {
@@ -140,7 +142,7 @@ export default function Listings() {
             setFormError("");
             setForm(EMPTY_FORM);
           }}
-          className="gap-1"
+          className="gap-1.5"
         >
           <Plus className="h-4 w-4" />
           New Listing
@@ -154,20 +156,29 @@ export default function Listings() {
         </div>
       )}
 
+      {/* Empty state */}
       {!loading && jobs.length === 0 && (
-        <div className="flex flex-col items-center py-20 text-center">
-          <List className="h-10 w-10 text-[var(--text-muted)] mb-3" />
-          <p className="text-sm font-medium text-[var(--text-secondary)]">
-            No listings yet
-          </p>
-          <p className="mt-1 text-xs text-[var(--text-muted)]">
+        <div className="flex flex-col items-center py-20 text-center animate-fade-in-up rounded-xl border border-[var(--border)] bg-[var(--surface)]">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface-raised)] border border-[var(--border)]">
+            <List className="h-7 w-7 text-[var(--text-muted)]" />
+          </div>
+          <p className="text-base font-semibold text-[var(--text-primary)]">No listings yet</p>
+          <p className="mt-1 text-sm text-[var(--text-muted)]">
             Create a job listing to start receiving applications.
           </p>
+          <Button
+            className="mt-4 gap-1.5"
+            onClick={() => { setShowForm(true); setFormError(""); setForm(EMPTY_FORM); }}
+          >
+            <Plus className="h-4 w-4" />
+            Create First Listing
+          </Button>
         </div>
       )}
 
+      {/* Listings table */}
       {!loading && jobs.length > 0 && (
-        <div className="animate-slide-up">
+        <div className="animate-fade-in-up">
           <Table>
             <TableHeader>
               <TableRow>
@@ -175,32 +186,40 @@ export default function Listings() {
                 <TableHead>Company</TableHead>
                 <TableHead>Location</TableHead>
                 <TableHead>Salary</TableHead>
-                <TableHead className="w-40" />
+                <TableHead className="w-36" />
               </TableRow>
             </TableHeader>
             <TableBody>
               {jobs.map((job) => (
                 <TableRow key={job._id}>
-                  <TableCell className="font-medium text-[var(--text)]">
+                  <TableCell className="font-medium text-[var(--text-primary)]">
                     {job.title}
                   </TableCell>
                   <TableCell className="text-[var(--text-secondary)]">
                     {job.company}
                   </TableCell>
-                  <TableCell className="text-[var(--text-secondary)]">
-                    {job.location}
+                  <TableCell>
+                    {job.location && (
+                      <span className="flex items-center gap-1 text-[var(--text-secondary)] text-xs">
+                        <MapPin className="h-3 w-3" />
+                        {job.location}
+                      </span>
+                    )}
                   </TableCell>
                   <TableCell className="text-xs text-[var(--text-muted)]">
-                    {job.salaryMin || job.salaryMax
-                      ? `$${job.salaryMin?.toLocaleString()} – $${job.salaryMax?.toLocaleString()}`
-                      : "—"}
+                    {job.salaryMin || job.salaryMax ? (
+                      <span className="flex items-center gap-0.5">
+                        <DollarSign className="h-3 w-3" />
+                        {job.salaryMin?.toLocaleString()} – {job.salaryMax?.toLocaleString()}
+                      </span>
+                    ) : "—"}
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-[var(--text-muted)]"
+                        className="h-8 w-8 p-0 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)]"
                         onClick={() => navigate(`/emp/listings/${job._id}`)}
                         title="Details"
                       >
@@ -209,10 +228,8 @@ export default function Listings() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-[var(--text-muted)]"
-                        onClick={() =>
-                          navigate(`/emp/listings/${job._id}/edit`)
-                        }
+                        className="h-8 w-8 p-0 text-[var(--text-muted)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)]"
+                        onClick={() => navigate(`/emp/listings/${job._id}/edit`)}
                         title="Edit"
                       >
                         <Pencil className="h-4 w-4" />
@@ -220,7 +237,7 @@ export default function Listings() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-[var(--text-muted)] hover:text-[var(--danger)]"
+                        className="h-8 w-8 p-0 text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-bg)]"
                         onClick={() => setDeleteTarget(job)}
                         title="Delete"
                       >
@@ -360,7 +377,9 @@ export default function Listings() {
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-[var(--danger)]" />
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--danger-bg)]">
+                <AlertTriangle className="h-4 w-4 text-[var(--danger)]" />
+              </span>
               Delete Listing
             </DialogTitle>
             <DialogDescription>

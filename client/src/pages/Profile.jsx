@@ -17,16 +17,12 @@ function RepeatableList({ label, items, onChange }) {
     next[i] = val;
     onChange(next);
   }
-  function add() {
-    onChange([...items, ""]);
-  }
-  function remove(i) {
-    onChange(items.filter((_, idx) => idx !== i));
-  }
+  function add() { onChange([...items, ""]); }
+  function remove(i) { onChange(items.filter((_, idx) => idx !== i)); }
 
   return (
     <div className="space-y-2">
-      <Label>{label}</Label>
+      <Label className="text-sm font-medium text-[var(--text-primary)]">{label}</Label>
       {items.map((item, i) => (
         <div key={i} className="flex gap-2">
           <Input
@@ -38,7 +34,7 @@ function RepeatableList({ label, items, onChange }) {
             type="button"
             variant="ghost"
             size="icon"
-            className="h-9 w-9 shrink-0 text-[var(--text-muted)] hover:text-[var(--danger)]"
+            className="h-9 w-9 shrink-0 text-[var(--text-muted)] hover:text-[var(--danger)] hover:bg-[var(--danger-bg)]"
             onClick={() => remove(i)}
           >
             <X className="h-4 w-4" />
@@ -75,8 +71,8 @@ function SkeletonForm() {
     <div className="max-w-2xl space-y-4">
       {[...Array(5)].map((_, i) => (
         <div key={i} className="space-y-2">
-          <div className="skeleton h-3 w-20" />
-          <div className="skeleton h-9 w-full" />
+          <div className="skeleton h-3 w-20 rounded-md" />
+          <div className="skeleton h-9 w-full rounded-lg" />
         </div>
       ))}
     </div>
@@ -156,11 +152,11 @@ export default function Profile() {
   if (loading) return <SkeletonForm />;
 
   return (
-    <form onSubmit={handleSave} className="max-w-2xl space-y-6 animate-slide-up">
+    <form onSubmit={handleSave} className="max-w-2xl space-y-6 animate-fade-in-up">
       {/* Basic Info */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Personal Information</CardTitle>
+          <CardTitle>Personal Information</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -205,10 +201,10 @@ export default function Profile() {
         </CardContent>
       </Card>
 
-      {/* Lists */}
+      {/* Background Lists */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Background</CardTitle>
+          <CardTitle>Background</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <RepeatableList
@@ -240,7 +236,7 @@ export default function Profile() {
       {/* Resume */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Resume</CardTitle>
+          <CardTitle>Resume</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {resumeUrl && (
@@ -248,14 +244,19 @@ export default function Profile() {
               href={`${API_URL}${resumeUrl}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-[var(--primary)] hover:underline"
+              className="inline-flex items-center gap-2 text-sm text-[var(--accent)] hover:underline transition-colors"
             >
               <Download className="h-4 w-4" />
               Download current resume
             </a>
           )}
           <div className="flex items-center gap-3">
-            <label className="flex cursor-pointer items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border)] bg-white px-3 py-2 text-sm text-[var(--text-secondary)] shadow-[var(--shadow-sm)] transition-colors hover:bg-gray-50">
+            <label className={[
+              "flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--border)]",
+              "bg-[var(--surface)] px-3 py-2 text-sm text-[var(--text-secondary)]",
+              "shadow-[var(--shadow-sm)] transition-colors hover:bg-[var(--surface-raised)]",
+              "hover:border-[var(--accent-soft-border)] hover:text-[var(--accent)]",
+            ].join(" ")}>
               <Upload className="h-4 w-4" />
               {uploading ? "Uploading…" : "Upload PDF"}
               <input
@@ -274,7 +275,7 @@ export default function Profile() {
 
       {/* Feedback */}
       {message && (
-        <div className="flex items-center gap-2 text-sm text-emerald-600">
+        <div className="flex items-center gap-2 text-sm text-[var(--success)] animate-fade-in">
           <CheckCircle2 className="h-4 w-4" />
           {message}
         </div>

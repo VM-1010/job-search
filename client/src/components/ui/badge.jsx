@@ -3,21 +3,33 @@ import { cva } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors",
+  "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors border",
   {
     variants: {
       variant: {
-        default: "bg-[var(--primary)] text-white",
-        secondary: "bg-gray-100 text-[var(--text-secondary)]",
-        outline: "border border-[var(--border)] text-[var(--text-secondary)]",
+        default:
+          "bg-[var(--accent)] text-white border-transparent",
+        accent:
+          "bg-[var(--accent-soft)] text-[var(--accent)] border-[var(--accent-soft-border)]",
+        secondary:
+          "bg-[var(--surface-raised)] text-[var(--text-secondary)] border-[var(--border)]",
+        outline:
+          "border-[var(--border)] bg-transparent text-[var(--text-secondary)]",
+        // Application status — semantic
         pending:
-          "bg-amber-50 text-amber-700 border border-amber-200",
+          "bg-[var(--warning-bg)] text-[var(--warning)] border-[var(--warning-border)]",
         interview:
-          "bg-blue-50 text-blue-700 border border-blue-200",
+          "bg-[var(--info-bg)] text-[var(--info)] border-[rgba(59,130,246,0.30)]",
         accepted:
-          "bg-emerald-50 text-emerald-700 border border-emerald-200",
+          "bg-[var(--success-bg)] text-[var(--success)] border-[var(--success-border)]",
         rejected:
-          "bg-red-50 text-red-700 border border-red-200",
+          "bg-[var(--danger-bg)] text-[var(--danger)] border-[var(--danger-border)]",
+        success:
+          "bg-[var(--success-bg)] text-[var(--success)] border-[var(--success-border)]",
+        warning:
+          "bg-[var(--warning-bg)] text-[var(--warning)] border-[var(--warning-border)]",
+        danger:
+          "bg-[var(--danger-bg)] text-[var(--danger)] border-[var(--danger-border)]",
       },
     },
     defaultVariants: {

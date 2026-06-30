@@ -2,9 +2,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { Badge } from "@/components/ui/badge";
 import { getApplicantProfile } from "@/api/api";
 import {
   ArrowLeft,
@@ -23,16 +22,18 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 function Section({ title, icon: Icon, items }) {
   if (!items || items.length === 0) return null;
   return (
-    <div className="space-y-2">
-      <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--text)]">
-        <Icon className="h-4 w-4 text-[var(--text-muted)]" />
+    <div className="space-y-2.5">
+      <h3 className="flex items-center gap-2 text-sm font-semibold text-[var(--text-primary)]">
+        <span className="flex h-6 w-6 items-center justify-center rounded-md bg-[var(--accent-soft)]">
+          <Icon className="h-3.5 w-3.5 text-[var(--accent)]" />
+        </span>
         {title}
       </h3>
-      <ul className="space-y-1.5 pl-6">
+      <ul className="space-y-1.5 pl-8">
         {items.map((item, i) => (
           <li
             key={i}
-            className="text-sm text-[var(--text-secondary)] list-disc"
+            className="relative text-sm text-[var(--text-secondary)] leading-snug list-disc"
           >
             {item}
           </li>
@@ -44,13 +45,19 @@ function Section({ title, icon: Icon, items }) {
 
 function SkeletonProfile() {
   return (
-    <Card className="max-w-xl">
-      <CardContent className="p-5 space-y-4">
-        <div className="skeleton h-6 w-40" />
-        <div className="skeleton h-4 w-28" />
-        <div className="skeleton h-20 w-full" />
-      </CardContent>
-    </Card>
+    <div className="max-w-xl space-y-4">
+      <div className="skeleton h-5 w-40 rounded-md" />
+      <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] p-5 space-y-4">
+        <div className="flex items-start gap-4">
+          <div className="skeleton h-14 w-14 rounded-full" />
+          <div className="space-y-2 flex-1">
+            <div className="skeleton h-5 w-36 rounded-md" />
+            <div className="skeleton h-3 w-28 rounded-md" />
+          </div>
+        </div>
+        <div className="skeleton h-20 w-full rounded-lg" />
+      </div>
+    </div>
   );
 }
 
@@ -79,16 +86,21 @@ export default function ApplicantProfile() {
     );
   if (!profile)
     return (
-      <div className="flex flex-col items-center py-20 text-center">
-        <UserCircle className="h-10 w-10 text-[var(--text-muted)] mb-3" />
-        <p className="text-sm text-[var(--text-secondary)]">
-          No profile found for this applicant.
+      <div className="flex flex-col items-center py-20 text-center animate-fade-in-up">
+        <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[var(--surface-raised)] border border-[var(--border)]">
+          <UserCircle className="h-7 w-7 text-[var(--text-muted)]" />
+        </div>
+        <p className="text-base font-semibold text-[var(--text-primary)]">No profile found</p>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          This applicant hasn't set up their profile yet.
         </p>
       </div>
     );
 
+  const initials = (profile.name || "?")[0].toUpperCase();
+
   return (
-    <div className="max-w-xl space-y-4 animate-slide-up">
+    <div className="max-w-xl space-y-4 animate-fade-in-up">
       <Button
         variant="ghost"
         size="sm"
@@ -100,33 +112,40 @@ export default function ApplicantProfile() {
       </Button>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-0">
           <div className="flex items-start gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--primary-light)] text-[var(--primary)] text-lg font-bold">
-              {(profile.name || "?")[0].toUpperCase()}
+            {/* Avatar */}
+            <div
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-white text-lg font-bold shadow-sm"
+              style={{ background: "linear-gradient(135deg, #5B5BF6 0%, #7C7CF9 100%)" }}
+            >
+              {initials}
             </div>
-            <div>
-              <CardTitle className="text-lg">
+            <div className="min-w-0">
+              <h2 className="text-lg font-bold tracking-tight text-[var(--text-primary)] leading-tight">
                 {profile.name || "—"}
-              </CardTitle>
-              {profile.place && (
-                <p className="mt-0.5 flex items-center gap-1 text-sm text-[var(--text-secondary)]">
-                  <MapPin className="h-3.5 w-3.5" />
-                  {profile.place}
-                </p>
-              )}
-              {profile.contact && (
-                <p className="mt-0.5 flex items-center gap-1 text-sm text-[var(--text-muted)]">
-                  <Phone className="h-3.5 w-3.5" />
-                  {profile.contact}
-                </p>
-              )}
+              </h2>
+              <div className="mt-1 flex flex-col gap-0.5">
+                {profile.place && (
+                  <p className="flex items-center gap-1 text-sm text-[var(--text-secondary)]">
+                    <MapPin className="h-3.5 w-3.5 shrink-0" />
+                    {profile.place}
+                  </p>
+                )}
+                {profile.contact && (
+                  <p className="flex items-center gap-1 text-sm text-[var(--text-muted)]">
+                    <Phone className="h-3.5 w-3.5 shrink-0" />
+                    {profile.contact}
+                  </p>
+                )}
+              </div>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
+
+        <CardContent className="space-y-5 pt-4">
           {profile.about && (
-            <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
+            <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">
               {profile.about}
             </p>
           )}
@@ -136,7 +155,11 @@ export default function ApplicantProfile() {
               href={`${API_URL}${profile.resumeUrl}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-[var(--radius-sm)] border border-[var(--border)] px-3 py-1.5 text-sm text-[var(--primary)] transition-colors hover:bg-[var(--primary-light)]"
+              className={[
+                "inline-flex items-center gap-2 rounded-lg border border-[var(--border)]",
+                "px-3 py-1.5 text-sm text-[var(--accent)] transition-all duration-150",
+                "hover:bg-[var(--accent-soft)] hover:border-[var(--accent-soft-border)]",
+              ].join(" ")}
             >
               <Download className="h-4 w-4" />
               Download Resume

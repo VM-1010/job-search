@@ -1,11 +1,12 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const Card = React.forwardRef(({ className, ...props }, ref) => (
+const Card = React.forwardRef(({ className, interactive = false, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-[var(--radius)] border border-[var(--border)] bg-white shadow-[var(--shadow)]",
+      "rounded-xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-sm)]",
+      interactive && "card-hover cursor-pointer",
       className
     )}
     {...props}
@@ -16,7 +17,7 @@ Card.displayName = "Card";
 const CardHeader = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex flex-col gap-1.5 p-5", className)}
+    className={cn("flex flex-col gap-1.5 p-5 pb-0", className)}
     {...props}
   />
 ));
@@ -25,7 +26,10 @@ CardHeader.displayName = "CardHeader";
 const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn("text-base font-semibold leading-tight text-[var(--text)]", className)}
+    className={cn(
+      "text-base font-semibold leading-tight tracking-tight text-[var(--text-primary)]",
+      className
+    )}
     {...props}
   />
 ));
@@ -34,21 +38,21 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-[var(--text-secondary)]", className)}
+    className={cn("text-sm text-[var(--text-secondary)] leading-relaxed", className)}
     {...props}
   />
 ));
 CardDescription.displayName = "CardDescription";
 
 const CardContent = React.forwardRef(({ className, ...props }, ref) => (
-  <div ref={ref} className={cn("p-5 pt-0", className)} {...props} />
+  <div ref={ref} className={cn("p-5", className)} {...props} />
 ));
 CardContent.displayName = "CardContent";
 
 const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("flex items-center p-5 pt-0", className)}
+    className={cn("flex items-center p-5 pt-0 gap-2", className)}
     {...props}
   />
 ));
